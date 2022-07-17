@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "zip": "tsc && 7z a -r function.zip ./dist/*  node_modules/",
-    "sendToLambda": "npm run zip && aws s3 cp function.zip s3://chrome-aws-lambda-jacob --profile user1 && rm function.zip && aws lambda update-function-code --function-name audible-libraries-scraper --s3-bucket chrome-aws-lambda-jacob --s3-key function.zip --profile user1 && aws s3 rm s3://chrome-aws-lambda-jacob/function.zip --profile user1 "
+    "sendToLambda": "npm run zip && aws s3 cp function.zip s3://chrome-aws-lambda-jacob --profile user2 && rm function.zip && aws lambda update-function-code --function-name audible-libraries-scraper --s3-bucket chrome-aws-lambda-jacob --s3-key function.zip --profile user2 && aws s3 rm s3://chrome-aws-lambda-jacob/function.zip --profile user2 "
   },
   "repository": {
     "type": "git",
