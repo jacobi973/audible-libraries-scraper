@@ -65,7 +65,11 @@ async function getBookDetails() {
 
                 const booksHandle = await page.$$('.adbl-library-content-row');
                 for (let bookHandle of booksHandle) {
-                    const title = await bookHandle.$eval('.bc-text.bc-size-headline3', element => element.textContent);
+                    const title = (await bookHandle.$eval('.bc-text.bc-size-headline3', element => element.textContent)).trim();
+                    // for some reason this title repeats in the list, so we need to filter it out
+                    if (title === 'The Lost Hero: The Heroes of Olympus, Book One') {
+                        continue;
+                    }
                     const author = await bookHandle.$eval('.bc-text.bc-size-callout', element => element.textContent);
                     const picture = await bookHandle.$eval('.bc-image-inset-border', element => element.getAttribute('src'));
                     let url: string;
@@ -100,7 +104,6 @@ async function getBookDetails() {
                 pageNumber++;
             }
 
-            console.log('bookData', bookData);
             for (let i = 0; i < bookData.length; i++) {
                 const params = {
                     TableName: 'audible-libraries',
@@ -119,7 +122,6 @@ async function getBookDetails() {
 
             await browser.close();
         }
-        console.log('finalBooks', finalBooks);
         if (finalBooks) {
             await sendEmail(finalBooks);
         }
@@ -181,7 +183,6 @@ async function sendEmail(finalBooks: any[]) {
     const userEmails = await cognitoIdentityServiceProvider.listUsers(params).promise();
     // push userEmails into an array of emails
     const emails = userEmails.Users.map(user => user.Username);
-    console.log('userEmails', userEmails);
     let html = htmlHolder();
     for (let i = 0; i < finalBooks.length; i++) {
         if (finalBooks[i].owner !== 'Jordan') {
@@ -229,7 +230,6 @@ async function sendEmail(finalBooks: any[]) {
     </tr>`
             if ((i + 1) === finalBooks.length) {
                 html += htmlHolder(true);
-                console.log('html', html);
                 // send email through SES
                 const params: aws.SES.SendEmailRequest = {
                     Destination: {
